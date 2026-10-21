@@ -1,0 +1,28 @@
+name: Upload Cloudflare Pages artifact
+description: Shared upload step for callers with their own serialized lifecycle guards
+inputs:
+  command:
+    description: Trusted, correctly quoted Wrangler Pages deploy command from the caller's guard
+    required: true
+  api-token:
+    required: true
+    description: Cloudflare Pages API token
+  account-id:
+    required: true
+    description: Cloudflare account ID
+  github-token:
+    required: true
+    description: Caller token for linked summaries and deployment records
+runs:
+  using: composite
+  steps:
+    - uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4
+      with:
+        apiToken: ${{ inputs.api-token }}
+        accountId: ${{ inputs.account-id }}
+        gitHubToken: ${{ inputs.github-token }}
+        wranglerVersion: '4.151.1'
+        packageManager: npm
+        command: ${{ inputs.command }}
+      env:
+        WRANGLER_SEND_METRICS: 'false'

@@ -69,3 +69,16 @@ bot-owned idempotent comments, invalid inputs, and configuration for several ind
 example callers. Hosted preview/production checks are separate from
 unit tests. Wrangler is pinned to 4.151.1 and its official action to a reviewed
 v4 commit; dependency updates require review.
+
+## Callers with lifecycle coordination
+
+Use `Warsinger/cloudflare-pages-deploy/upload@SHARED_COMMIT_SHA` as a step when
+existing pause/cleanup/maintenance policies must surround an upload inside the
+caller's own serialized job. Pass `api-token`, `account-id`, `github-token` and
+`command` (a trusted, correctly quoted `pages deploy` command). This thin action
+centralizes the same pinned official action and Wrangler version; it does not
+replace or bypass the caller's validation, queue, preflight or post-upload checks.
+Prefer the reusable workflow above for ordinary stateless callers. Do not put
+untrusted event text directly into `command`; preserve an argument boundary for
+every value, and run lifecycle checks before invoking the action. The command is
+parsed by the official action's argument parser, not a shell script.
