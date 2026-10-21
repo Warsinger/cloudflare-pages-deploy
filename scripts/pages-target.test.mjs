@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { deploymentBranch } from './pages-target.mjs';
 
 const sha = 'a'.repeat(40);
-const env = { GITHUB_REPOSITORY: 'Warsinger/space-invaders-go', GITHUB_SHA: sha,
+const env = { GITHUB_REPOSITORY: 'example-owner/example-app', GITHUB_SHA: sha,
   GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/preview', PREVIEW_PR: '13' };
 const pr = { state: 'open', base: { ref: 'main' }, head: { sha, ref: 'preview', repo: { full_name: env.GITHUB_REPOSITORY } } };
 

@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { updatePreviewComment } from './preview-comment.mjs';
 
-const config = {repo: 'Warsinger/space-invaders-go', hostname: 'alien-invaders.pages.dev', title: 'Space Invaders', marker: '<!-- space-invaders-preview -->'};
-const args = ['18', 'https://pr-18.alien-invaders.pages.dev/', 'a'.repeat(40), 'https://github.com/Warsinger/space-invaders-go/actions/runs/123', config];
+const config = {repo: 'example-owner/example-app', hostname: 'example-site.pages.dev', title: 'Example App', marker: '<!-- example-preview -->'};
+const args = ['18', 'https://pr-18.example-site.pages.dev/', 'a'.repeat(40), 'https://github.com/example-owner/example-app/actions/runs/123', config];
 test('creates a linked preview comment after searching all pages', async () => {
   const calls = [];
   await updatePreviewComment(async (endpoint, options) => {
@@ -11,13 +11,13 @@ test('creates a linked preview comment after searching all pages', async () => {
     if (endpoint.endsWith('&page=1')) return Array.from({ length: 100 }, () => ({ body: 'unrelated' }));
     if (endpoint.endsWith('&page=2')) return [];
     assert.equal(options.method, 'POST');
-    assert.match(options.body.body, /\[Open Space Invaders\]\(https:\/\/pr-18.alien-invaders.pages.dev\/\)/);
+    assert.match(options.body.body, /\[Open Example App\]\(https:\/\/pr-18.example-site.pages.dev\/\)/);
     return {};
   }, ...args);
   assert.equal(calls.length, 3);
 });
 test('updates its own comment and repeated identical runs do not write', async () => {
-  let stored = { id: 42, user: { login: 'github-actions[bot]' }, body: '<!-- space-invaders-preview -->old' };
+  let stored = { id: 42, user: { login: 'github-actions[bot]' }, body: '<!-- example-preview -->old' };
   let writes = 0;
   const github = async (endpoint, options) => {
     if (!options) return [stored];
@@ -33,7 +33,7 @@ test('updates its own comment and repeated identical runs do not write', async (
 });
 test('does not edit another author and rejects mismatched preview URLs', async () => {
   await updatePreviewComment(async (_, options) => {
-    if (!options) return [{ id: 1, user: { login: 'Warsinger' }, body: '<!-- space-invaders-preview -->' }];
+    if (!options) return [{ id: 1, user: { login: 'example-owner' }, body: '<!-- example-preview -->' }];
     assert.equal(options.method, 'POST');
     return {};
   }, ...args);

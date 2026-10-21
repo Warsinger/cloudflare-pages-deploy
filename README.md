@@ -15,7 +15,7 @@ explicit rather than checking out the caller or an unpinned main branch.
 
 ```yaml
   deploy:
-    needs: [native, browser]
+    needs: [build]
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.deploy)
     uses: Warsinger/cloudflare-pages-deploy/.github/workflows/pages.yml@SHARED_COMMIT_SHA
     permissions:
@@ -24,12 +24,12 @@ explicit rather than checking out the caller or an unpinned main branch.
       deployments: write
     with:
       deployment-ref: SHARED_COMMIT_SHA
-      artifact-name: space-invaders-web
-      project-name: alien-invaders
-      hostname: alien-invaders.pages.dev
-      title: Space Invaders
+      artifact-name: example-web
+      project-name: example-site
+      hostname: example-site.pages.dev
+      title: Example App
       preview-pr: ${{ inputs.preview_pr }}
-      comment-marker: '<!-- space-invaders-preview -->'
+      comment-marker: '<!-- example-preview -->'
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -40,7 +40,7 @@ Callers build/test first and upload the complete static directory using
 Default revision checking requires `version.json` with a `revision` equal to the
 caller SHA. Apps without that manifest can explicitly set `check-revision: false`;
 they retain current-ref and same-workflow artifact isolation but lose the extra
-manifest check. Existing Go callers should keep the default.
+manifest check. Callers with revision manifests should keep the default.
 
 Only pushes and manual dispatch can publish. Production must be the current main
 revision. A preview requires the current head of an open same-repository PR to
@@ -65,7 +65,7 @@ an approved consumer merge; Cloudflare rollback remains an owner operation.
 
 Run `node --test scripts/*.test.mjs` (Node 24). Tests cover project lookup without
 mutation, current main/manual preview policy, fork/stale rejection, paginated
-bot-owned idempotent comments, invalid inputs, and configuration for Go, Rust and
-static landing-page callers. Hosted preview/production checks are separate from
+bot-owned idempotent comments, invalid inputs, and configuration for several independent
+example callers. Hosted preview/production checks are separate from
 unit tests. Wrangler is pinned to 4.151.1 and its official action to a reviewed
 v4 commit; dependency updates require review.
